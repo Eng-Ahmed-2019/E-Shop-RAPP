@@ -4,14 +4,17 @@ import { fetchOrders, deleteOrder, updateOrderStatus } from "../../services/orde
 import { isAdmin } from "../../services/authService";
 
 function OrdersList() {
+  // 📅 always show local time: UTC from backend will show local, plain string will show as is
   const formatOrderDate = (value) => {
-    if (!value) return "-";
-    const str = String(value);
-    const hasTz = /Z|[+-]\d{2}:?\d{2}$/.test(str);
-    const dt = new Date(hasTz ? str : `${str}Z`);
-    if (isNaN(dt.getTime())) return str;
-    return dt.toLocaleString();
-  };
+  if (!value) return "-";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return String(value);
+  // اليوم/الشهر/السنة - الساعة:دقيقة AM/PM بتوقيت جهاز المستخدم
+  return date.toLocaleString('en-GB', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: true
+  }).replace(",", " -");
+};
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +61,38 @@ function OrdersList() {
     load();
   }, []);
 
+  // حفظ الحالة مع feedback صغير
+  const saveStatus = async (id, newStatus, auto = false) => {
+    if (!newStatus) return;
+    try {
+      await updateOrderStatus(id, newStatus);
+      await load();
+    } catch (e) {
+      // نفس الشيء، بدون feedback
+    }
+  };
+
+  // عند تغيير الـ select
+  const handleStatusChange = (id, value) => {
+    setStatusEdits((prev) => {
+      const newEdits = { ...prev, [id]: value };
+      // حفظ تلقائي إذا كانت الحالة مختارة هي Completed أو Cancelled
+      if (value === "Completed" || value === "Cancelled") {
+        setTimeout(() => {
+          saveStatus(id, value, true);
+        }, 0);
+      }
+      return newEdits;
+    });
+  };
+
+  // عند الضغط على زر الحفظ
+  const handleStatusSaveBtn = (id) => {
+    const newStatus = statusEdits[id];
+    if (!newStatus) return;
+    saveStatus(id, newStatus);
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this order?")) return;
     try {
@@ -65,21 +100,6 @@ function OrdersList() {
       await load();
     } catch (e) {
       alert(e?.response?.data || "Failed to delete");
-    }
-  };
-
-  const handleStatusChange = (id, value) => {
-    setStatusEdits((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const handleStatusSave = async (id) => {
-    const newStatus = statusEdits[id];
-    if (!newStatus) return;
-    try {
-      await updateOrderStatus(id, newStatus);
-      await load();
-    } catch (e) {
-      alert(e?.response?.data || "Failed to update status");
     }
   };
 
@@ -146,7 +166,6 @@ function OrdersList() {
     >
       <div style={cardStyle}>
         <h2 style={{ marginBottom: 20, fontWeight: "bold" }}>Orders List</h2>
-
         {orders.length === 0 ? (
           <p style={{ color: "#f3f4f6", textAlign: "center", fontStyle: "italic" }}>No orders found.</p>
         ) : (
@@ -160,78 +179,69 @@ function OrdersList() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((o, idx) => (
-                <tr
-                  key={o.id}
-                  style={{
-                    background: idx % 2 === 0 ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
-                    borderBottom: "1px solid rgba(255,255,255,0.2)",
-                  }}
-                >
-                  <td style={{ padding: 12 }}>{o.id}</td>
-                  <td style={{ padding: 12 }}>{formatOrderDate(o.orderDate || o.OrderDate)}</td>
-                  <td style={{ padding: 12 }}>
-                    {admin ? (() => {
-                      const curr = o.status ?? o.Status ?? "Pending";
-                      const selectVal = statusEdits[o.id] ?? curr;
-                      const isCancelled = selectVal === "Cancelled";
-                      const isCompleted = selectVal === "Completed";
-                      if (isCancelled) {
-                        return (
-                          <span style={{ color: '#ef4444', fontWeight: 700, fontStyle: 'italic' }}>Cancelled</span>
-                        );
-                      }
-                      if (isCompleted) {
-                        return (
-                          <span style={{ color: '#34d399', fontWeight: 700, fontStyle: 'italic' }}>Completed</span>
-                        );
-                      }
-                      const nextOptions = getNextStatusOptions(curr);
-                      return (
-                        <select
-                          value={selectVal}
-                          onChange={(e) => handleStatusChange(o.id, e.target.value)}
-                          style={{ padding: 6, borderRadius: 6, border: "none", outline: "none" }}
-                        >
-                          <option value={curr} disabled>{curr}</option>
-                          {nextOptions.map((opt) => (
-                            <option value={opt} key={opt}>{opt}</option>
-                          ))}
-                        </select>
-                      );
-                    })() : (
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color: (o.status || o.Status || "").toLowerCase() === "completed" ? "#34d399" : "#fbbf24",
-                        }}
-                      >
-                        {o.status || o.Status}
-                      </span>
-                    )}
-                  </td>
-                  <td style={{ padding: 12, display: "flex", justifyContent: "center", gap: "10px" }}>
-                    {(() => {
-                      const curr = o.status ?? o.Status ?? "Pending";
-                      const selectVal = statusEdits[o.id] ?? curr;
-                      const isNoActions = !admin ? ((curr || "").toLowerCase() !== "pending")
-                        : ((selectVal === "Cancelled") || (selectVal === "Completed") || (curr || "").toLowerCase() === "completed" || (curr || "").toLowerCase() === "cancelled");
-                      if (isNoActions) {
-                        return <span style={{ color: "#b0b4be", fontStyle: "italic" }}>No Actions Available</span>;
-                      }
-                      if (!admin) {
-                        return (
-                          <>
-                            <button onClick={() => navigate(`/orders/${o.id}`)} style={actionBtnStyle("#3b82f6")}>Details</button>
-                            <button onClick={() => handleDelete(o.id)} style={actionBtnStyle("#ef4444")}>Delete</button>
-                          </>
-                        );
-                      }
-                      return <button onClick={() => handleStatusSave(o.id)} style={actionBtnStyle("#10b981")}>Save</button>;
-                    })()}
-                  </td>
-                </tr>
-              ))}
+              {orders.map((o, idx) => {
+                const curr = o.status ?? o.Status ?? "Pending";
+                const selectVal = statusEdits[o.id] ?? curr;
+                const isDone = ["Completed", "Cancelled"].includes(selectVal) || ["completed", "cancelled"].includes((curr || "").toLowerCase());
+                const nextOptions = getNextStatusOptions(curr);
+                return (
+                  <tr
+                    key={o.id}
+                    style={{
+                      background: idx % 2 === 0 ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
+                      borderBottom: "1px solid rgba(255,255,255,0.2)"
+                    }}>
+                    <td style={{ padding: 12 }}>{o.id}</td>
+                    <td style={{ padding: 12 }}>{formatOrderDate(o.orderDate || o.OrderDate || "-")}</td>
+                    <td style={{ padding: 12 }}>
+                      {admin ? (
+                        isDone ? (
+                          <span style={{ color: selectVal === "Cancelled" ? '#ef4444' : '#34d399', fontWeight: 700, fontStyle: 'italic' }}>{selectVal}</span>
+                        ) : (
+                          <select
+                            value={selectVal}
+                            onChange={e => handleStatusChange(o.id, e.target.value)}
+                            style={{ padding: 6, borderRadius: 6, border: "none", outline: "none" }}
+                          >
+                            <option value={curr} disabled>{curr}</option>
+                            {nextOptions.map((opt) => (
+                              <option value={opt} key={opt}>{opt}</option>
+                            ))}
+                          </select>
+                        )
+                      ) : (
+                        <span style={{ fontWeight: 600, color: (o.status || o.Status || "").toLowerCase() === "completed" ? "#34d399" : "#fbbf24" }}>
+                          {o.status || o.Status}
+                        </span>
+                      )}
+                    </td>
+                    <td style={{ padding: 12, display: "flex", justifyContent: "center", gap: "10px" }}>
+                      {(() => {
+                        if (!admin) {
+                          // المستخدم العادي لو الحالة ليست Pending، يظهر فقط no actions
+                          if (["Completed","Cancelled","Processing"].includes(curr) || ["completed","cancelled","processing"].includes((curr || "").toLowerCase())) {
+                            return <span style={{ color: "#b0b4be", fontStyle: "italic" }}>No Actions Available</span>;
+                          }
+                          // الحالة Pending، تظهر أكشنز المستخدم
+                          return (
+                            <>
+                              <button onClick={() => navigate(`/orders/${o.id}`)} style={{ padding: "6px 14px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, transition: "0.2s" }}>Details</button>
+                              <button onClick={() => handleDelete(o.id)} style={{ padding: "6px 14px", background: "#ef4444", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, transition: "0.2s" }}>Delete</button>
+                            </>
+                          );
+                        }
+                        // الأدمن: الأكشنز كما هي (Save يظهر لو ينطبق الشرط عند الأدمن فقط)
+                        const selectVal = statusEdits[o.id] ?? curr;
+                        const isDone = ["Completed", "Cancelled"].includes(selectVal) || ["completed", "cancelled"].includes((curr || "").toLowerCase());
+                        if (isDone) {
+                          return <span style={{ color: "#b0b4be", fontStyle: "italic" }}>No Actions Available</span>;
+                        }
+                        return <button onClick={() => handleStatusSaveBtn(o.id)} style={{ padding: "6px 14px", background: "#10b981", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 600, transition: "0.2s" }}>Save</button>;
+                      })()}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

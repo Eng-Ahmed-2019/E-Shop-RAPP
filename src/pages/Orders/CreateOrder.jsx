@@ -65,14 +65,14 @@ function CreateOrder() {
     e.preventDefault();
     setError("");
     const payload = {
-      items: items
-        .filter((it) => it.productId && Number(it.quantity) > 0)
-        .map((it) => ({
-          productId: Number(it.productId),
-          quantity: Number(it.quantity),
-          price: Number(it.price),
-        })),
-    };
+  items: items
+    .filter((it) => it.productId && Number(it.quantity) > 0)
+    .map((it) => ({
+      productId: Number(it.productId),
+      quantity: Number(it.quantity),
+      price: Number(it.price),
+    })),
+};
 
     if (!payload.items.length) {
       setError("Add at least one valid item");

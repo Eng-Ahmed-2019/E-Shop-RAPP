@@ -33,9 +33,7 @@ export const createOrder = async (payload) => {
 };
 
 export const updateOrderStatus = async (id, newStatus) => {
-  await ordersApi.put(`/orders/${id}`, JSON.stringify(newStatus), {
-    headers: { "Content-Type": "application/json" },
-  });
+  await ordersApi.put(`/orders/${id}`, { newStatus });
 };
 
 export const deleteOrder = async (id) => {
