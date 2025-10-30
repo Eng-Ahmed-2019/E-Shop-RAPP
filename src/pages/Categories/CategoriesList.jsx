@@ -7,6 +7,7 @@ function CategoriesList() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +46,10 @@ function CategoriesList() {
   };
 
   const admin = isAdmin();
+
+  const filteredCategories = categories.filter(cat =>
+    cat.name?.toLowerCase().includes(searchTerm.trim().toLowerCase())
+  );
 
   // 🎨 التنسيقات الاحترافية الموحدة
   const pageStyle = {
@@ -154,35 +159,54 @@ function CategoriesList() {
 
   return (
     <div style={pageStyle}>
-      <div style={headerStyle}>
+      <div style={{...headerStyle, gap: 19}}>
         <h2 style={titleStyle}>📦 Categories</h2>
+        {/* شريط البحث */}
+        <input
+          type="text"
+          placeholder="🔎 Search categories..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{
+            background: "#fff",
+            padding: "7px 14px",
+            borderRadius: 8,
+            fontSize: 15,
+            minWidth: 185,
+            border: "1px solid #ccc",
+            color: "#333",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.045)",
+            outline: "none",
+            marginRight: 17
+          }}
+        />
         {admin && (
           <button
             style={addButtonStyle}
             onClick={() => navigate("/categories/add")}
-            onMouseEnter={(e) => hoverAdd(e, true)}
-            onMouseLeave={(e) => hoverAdd(e, false)}
+            onMouseEnter={e => hoverAdd(e, true)}
+            onMouseLeave={e => hoverAdd(e, false)}
           >
             ➕ Add Category
           </button>
         )}
       </div>
-
-      {categories.length > 0 ? (
+      {/* النتائج */}
+      {filteredCategories.length > 0 ? (
         <div style={gridStyle}>
-          {categories.map((cat) => (
+          {filteredCategories.map(cat => (
             <div
               key={cat.id}
               style={cardStyle}
               onClick={() => navigate(`/categories/${cat.id}`)}
-              onMouseEnter={(e) => cardHover(e, true)}
-              onMouseLeave={(e) => cardHover(e, false)}
+              onMouseEnter={e => cardHover(e, true)}
+              onMouseLeave={e => cardHover(e, false)}
             >
               <h3
                 style={{
                   marginBottom: "10px",
                   fontSize: "18px",
-                  fontWeight: "600",
+                  fontWeight: "600"
                 }}
               >
                 {cat.name}
@@ -190,12 +214,11 @@ function CategoriesList() {
               <p style={{ color: "#e0e0e0", minHeight: "40px" }}>
                 {cat.description || "No description available"}
               </p>
-
               {admin && (
                 <div style={{ marginTop: "15px" }}>
                   <button
                     style={editBtn}
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       navigate(`/categories/edit/${cat.id}`);
                     }}
@@ -204,7 +227,7 @@ function CategoriesList() {
                   </button>
                   <button
                     style={delBtn}
-                    onClick={(e) => handleDelete(e, cat.id, cat.name)}
+                    onClick={e => handleDelete(e, cat.id, cat.name)}
                   >
                     🗑 Delete
                   </button>
@@ -217,13 +240,18 @@ function CategoriesList() {
         <p
           style={{
             textAlign: "center",
-            fontWeight: "600",
+            fontWeight: "bolder",
+            color: "#ffeced",
+            background: "#ec646c",
             fontStyle: "italic",
-            color: "#eee",
-            marginTop: "40px",
+            borderRadius: 12,
+            padding: "17px 0",
+            marginTop: 30,
+            fontSize: 17,
+            boxShadow: "0 2px 8px #c6262611"
           }}
         >
-          No categories found.
+          {searchTerm.trim() ? `No categories found for "${searchTerm}".` : "No categories found."}
         </p>
       )}
     </div>

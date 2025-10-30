@@ -37,12 +37,23 @@ function Navbar({ isLoggedIn, setIsLoggedIn, userName }) {
     cursor: "pointer",
     fontSize: "17px",
     fontWeight: "500",
-    transition: "color 0.3s, transform 0.3s",
+    color: "#6a5af9", // لون بنفسجي داكن ظاهر دائمًا
+    textShadow: "0px 1px 3px rgba(134, 67, 255, 0.04)",
+    padding: "5px 12px",
+    borderRadius: "6px",
+    transition: "all 0.3s",
+    background: "linear-gradient(90deg, rgba(240,239,255,0.0) 93%, rgba(134,67,255,0.045) 100%)", // خلفية لطيفة شفافة
   };
 
   const linkHover = (e, hover) => {
-    e.target.style.color = hover ? "#d3c6ff" : "#fff";
-    e.target.style.transform = hover ? "translateY(-2px)" : "translateY(0)";
+    e.target.style.color = hover ? "#fff" : "#6a5af9";
+    e.target.style.background = hover
+      ? "linear-gradient(90deg, #6a5af9 30%, #8740ff 100%)"
+      : "linear-gradient(90deg, rgba(240,239,255,0.0) 93%, rgba(134,67,255,0.045) 100%)";
+    e.target.style.transform = hover ? "translateY(-2px) scale(1.05)" : "translateY(0) scale(1.0)";
+    e.target.style.boxShadow = hover
+      ? "0 3px 12px rgba(106,90,249,0.11)"
+      : "none";
   };
 
   const buttonStyle = {

@@ -20,6 +20,27 @@ function OrdersList() {
   const admin = isAdmin();
   const [statusEdits, setStatusEdits] = useState({});
 
+  // ترتيب الحالات
+  const statusOrder = ["Pending", "Processing", "Completed"];
+
+  // helper لإرجاع الخيارات المتاحة
+  function getNextStatusOptions(currentStatus) {
+    const lowerCurrent = (currentStatus || "Pending").toLowerCase();
+    // index
+    const idx = statusOrder.findIndex(
+      (s) => s.toLowerCase() === lowerCurrent
+    );
+    let options = [];
+    if (idx >= 0) {
+      // فقط الحالات القادمة
+      options = statusOrder.slice(idx + 1);
+    }
+    if (!options.includes("Cancelled") && lowerCurrent !== "completed") {
+      options.push("Cancelled");
+    }
+    return options;
+  }
+
   const load = async () => {
     try {
       setLoading(true);
@@ -150,18 +171,35 @@ function OrdersList() {
                   <td style={{ padding: 12 }}>{o.id}</td>
                   <td style={{ padding: 12 }}>{formatOrderDate(o.orderDate || o.OrderDate)}</td>
                   <td style={{ padding: 12 }}>
-                    {admin ? (
-                      <select
-                        value={statusEdits[o.id] ?? o.status ?? o.Status ?? "Pending"}
-                        onChange={(e) => handleStatusChange(o.id, e.target.value)}
-                        style={{ padding: 6, borderRadius: 6, border: "none", outline: "none" }}
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
-                    ) : (
+                    {admin ? (() => {
+                      const curr = o.status ?? o.Status ?? "Pending";
+                      const selectVal = statusEdits[o.id] ?? curr;
+                      const isCancelled = selectVal === "Cancelled";
+                      const isCompleted = selectVal === "Completed";
+                      if (isCancelled) {
+                        return (
+                          <span style={{ color: '#ef4444', fontWeight: 700, fontStyle: 'italic' }}>Cancelled</span>
+                        );
+                      }
+                      if (isCompleted) {
+                        return (
+                          <span style={{ color: '#34d399', fontWeight: 700, fontStyle: 'italic' }}>Completed</span>
+                        );
+                      }
+                      const nextOptions = getNextStatusOptions(curr);
+                      return (
+                        <select
+                          value={selectVal}
+                          onChange={(e) => handleStatusChange(o.id, e.target.value)}
+                          style={{ padding: 6, borderRadius: 6, border: "none", outline: "none" }}
+                        >
+                          <option value={curr} disabled>{curr}</option>
+                          {nextOptions.map((opt) => (
+                            <option value={opt} key={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      );
+                    })() : (
                       <span
                         style={{
                           fontWeight: 600,
@@ -173,26 +211,24 @@ function OrdersList() {
                     )}
                   </td>
                   <td style={{ padding: 12, display: "flex", justifyContent: "center", gap: "10px" }}>
-                    {!admin ? (
-                      ((o.status || o.Status || "").toLowerCase() !== "pending") ? (
-                        <span style={{ color: "#ccc", fontStyle: "italic" }}>No Actions</span>
-                      ) : (
-                        <>
-                          <button onClick={() => navigate(`/orders/${o.id}`)} style={actionBtnStyle("#3b82f6")}>
-                            Details
-                          </button>
-                          <button onClick={() => handleDelete(o.id)} style={actionBtnStyle("#ef4444")}>
-                            Delete
-                          </button>
-                        </>
-                      )
-                    ) : (o.status || o.Status || "").toLowerCase() === "completed" ? (
-                      <span style={{ color: "#ccc", fontStyle: "italic" }}>No Actions</span>
-                    ) : (
-                      <button onClick={() => handleStatusSave(o.id)} style={actionBtnStyle("#10b981")}>
-                        Save
-                      </button>
-                    )}
+                    {(() => {
+                      const curr = o.status ?? o.Status ?? "Pending";
+                      const selectVal = statusEdits[o.id] ?? curr;
+                      const isNoActions = !admin ? ((curr || "").toLowerCase() !== "pending")
+                        : ((selectVal === "Cancelled") || (selectVal === "Completed") || (curr || "").toLowerCase() === "completed" || (curr || "").toLowerCase() === "cancelled");
+                      if (isNoActions) {
+                        return <span style={{ color: "#b0b4be", fontStyle: "italic" }}>No Actions Available</span>;
+                      }
+                      if (!admin) {
+                        return (
+                          <>
+                            <button onClick={() => navigate(`/orders/${o.id}`)} style={actionBtnStyle("#3b82f6")}>Details</button>
+                            <button onClick={() => handleDelete(o.id)} style={actionBtnStyle("#ef4444")}>Delete</button>
+                          </>
+                        );
+                      }
+                      return <button onClick={() => handleStatusSave(o.id)} style={actionBtnStyle("#10b981")}>Save</button>;
+                    })()}
                   </td>
                 </tr>
               ))}

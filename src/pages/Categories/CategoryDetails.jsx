@@ -9,6 +9,7 @@ function CategoryDetails() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchCategoryAndProducts = async () => {
@@ -40,6 +41,10 @@ function CategoryDetails() {
     return <p style={{ textAlign: "center", color: "red" }}>{error}</p>;
   }
 
+  const filteredProducts = products.filter(product =>
+    product.name?.toLowerCase().includes(searchTerm.trim().toLowerCase())
+  );
+
   return (
     <div style={{ padding: "40px", background: "#f5f6fa", minHeight: "100vh" }}>
       <button
@@ -64,9 +69,28 @@ function CategoryDetails() {
         </div>
       )}
 
-      <h3 style={{ color: "#333", marginBottom: "20px" }}>Products in this category:</h3>
+      <div style={{display: 'flex', alignItems: 'center', gap: 28, marginBottom: 16}}>
+        <h3 style={{ color: "#333", margin: 0 }}>Products in this category:</h3>
+        <input
+          type="text"
+          placeholder="🔎 Search products..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{
+            background: '#fff',
+            padding: '7px 13px',
+            borderRadius: 8,
+            fontSize: 15,
+            minWidth: 185,
+            border: '1px solid #ccc',
+            color: '#333',
+            boxShadow: '0 2px 5px 0 #5756a014',
+            outline: 'none',
+          }}
+        />
+      </div>
 
-      {products.length > 0 ? (
+      {filteredProducts.length > 0 ? (
         <div
           style={{
             display: "grid",
@@ -74,7 +98,7 @@ function CategoryDetails() {
             gap: "20px",
           }}
         >
-          {products.map((product) => (
+          {filteredProducts.map(product => (
             <div
               key={product.id}
               style={{
@@ -96,8 +120,20 @@ function CategoryDetails() {
           ))}
         </div>
       ) : (
-        <p style={{ textAlign: "center", color: "#666", fontStyle: "italic" }}>
-          No products found in this category.
+        <p
+          style={{
+            textAlign: "center",
+            color: "#d12f40",
+            background: "#ffeef2",
+            fontStyle: "italic",
+            fontWeight: 600,
+            fontSize: 16,
+            borderRadius: 10,
+            marginTop: 35,
+            padding: "16px 0",
+          }}
+        >
+          {searchTerm.trim() ? `No products found for "${searchTerm}".` : "No products found in this category."}
         </p>
       )}
     </div>

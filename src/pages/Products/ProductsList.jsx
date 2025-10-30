@@ -8,6 +8,7 @@ function ProductsList() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -31,9 +32,11 @@ function ProductsList() {
     fetchProductsAndCategories();
   }, []);
 
-  const visibleProducts = selectedCategoryId
-    ? products.filter((p) => String(p.categoryId) === String(selectedCategoryId))
-    : products;
+  const visibleProducts = products.filter((p) => {
+    const matchCategory = selectedCategoryId ? String(p.categoryId) === String(selectedCategoryId) : true;
+    const matchSearch = searchTerm.trim() === "" ? true : (p.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchCategory && matchSearch;
+  });
 
   const handleDelete = async (e, id, name) => {
     e.stopPropagation();
@@ -76,8 +79,8 @@ function ProductsList() {
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          marginBottom: 30,
-          gap: 16
+          marginBottom: 10,
+          gap: 12,
         }}
       >
         <h2
@@ -85,12 +88,30 @@ function ProductsList() {
             fontSize: "2.2rem",
             fontWeight: "bold",
             color: "#333",
-            letterSpacing: 0.5
+            letterSpacing: 0.5,
           }}
         >
           🛒 Product Management
         </h2>
-
+        {/* شريط البحث */}
+        <input
+          type="text"
+          placeholder="🔎 Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            background: "#fff",
+            padding: "7px 14px",
+            borderRadius: 8,
+            fontSize: 16,
+            minWidth: 185,
+            border: "1px solid #ccc",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.045)",
+            outline: "none",
+            color: "#3b3b3b",
+            marginRight: 12,
+          }}
+        />
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <label
             htmlFor="categoryFilter"
@@ -109,7 +130,7 @@ function ProductsList() {
               minWidth: 180,
               background: "#fff",
               boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-              cursor: "pointer"
+              cursor: "pointer",
             }}
           >
             <option value="">All</option>
@@ -120,7 +141,6 @@ function ProductsList() {
             ))}
           </select>
         </div>
-
         {admin && (
           <button
             onClick={() => navigate("/products/add")}
@@ -133,14 +153,10 @@ function ProductsList() {
               cursor: "pointer",
               fontWeight: "bold",
               boxShadow: "0 4px 10px rgba(59,130,246,0.3)",
-              transition: "all 0.3s ease"
+              transition: "all 0.3s ease",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#2563eb")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "#3b82f6")
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#3b82f6")}
           >
             ➕ Add Product
           </button>
@@ -264,12 +280,19 @@ function ProductsList() {
             style={{
               textAlign: "center",
               fontWeight: "bolder",
-              color: "#333",
+              color: "#b91c1c",
               fontStyle: "italic",
-              gridColumn: "1 / -1"
+              background: "#fff0f3",
+              borderRadius: 12,
+              padding: "18px 0",
+              gridColumn: "1 / -1",
+              fontSize: 18,
+              boxShadow: "0 2px 8px 0 #f36f6f11",
             }}
           >
-            No products found.
+            {searchTerm.trim()
+              ? `No products found for "${searchTerm}".`
+              : "No products found."}
           </p>
         )}
       </div>

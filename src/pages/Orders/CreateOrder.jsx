@@ -133,12 +133,28 @@ function CreateOrder() {
   const inputStyle = {
     padding: "10px",
     borderRadius: "10px",
-    border: "none",
+    border: "1.5px solid #bdbdfa",
     outline: "none",
-    fontSize: "14px",
+    fontSize: "15px",
     width: "100%",
-    background: "rgba(255,255,255,0.2)",
-    color: "#fff",
+    background: "rgba(42,37,70,0.87)", // خلفية بنفسجي غامق واضحة
+    color: "#f7f7ff",
+    marginTop: "3px",
+    marginBottom: "3px",
+    boxShadow: "0 2px 12px 0 rgba(106,90,249,0.06)",
+    transition: "border .3s, background .3s",
+  };
+  const labelStyle = {
+    fontWeight: 600,
+    fontSize: '15.3px',
+    marginBottom: '3px',
+    background: 'linear-gradient(92deg, #a084ff, #6a5af9, #8740ff 90%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    textShadow: '0 2px 10px rgba(106,90,249,0.13)',
+    letterSpacing: '.7px',
+    textTransform: 'capitalize',
+    paddingLeft: '1.5px',
   };
 
   const buttonStyle = {
@@ -192,7 +208,7 @@ function CreateOrder() {
           <div key={idx} style={cardStyle}>
             <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "center" }}>
               <div style={{ flex: "1.2", display: "flex", flexDirection: "column" }}>
-                <label>Product</label>
+                <label style={labelStyle}>Product</label>
                 <input
                   value={namesByIndex[idx] || `#${it.productId}`}
                   readOnly
@@ -202,7 +218,7 @@ function CreateOrder() {
               </div>
 
               <div style={{ flex: "1", display: "flex", flexDirection: "column" }}>
-                <label>Quantity</label>
+                <label style={labelStyle}>Quantity</label>
                 <input
                   type="number"
                   min="0"
@@ -213,7 +229,7 @@ function CreateOrder() {
               </div>
 
               <div style={{ flex: "1", display: "flex", flexDirection: "column" }}>
-                <label>Total Price</label>
+                <label style={labelStyle}>Total Price</label>
                 <input
                   value={it.price}
                   readOnly
