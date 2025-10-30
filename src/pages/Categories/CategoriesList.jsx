@@ -12,12 +12,12 @@ function CategoriesList() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-  const response = await categoriesApi.get("/categories");
+        const response = await categoriesApi.get("/categories");
         setCategories(response.data);
       } catch (err) {
         console.error("Categories fetch error:", err);
-        // Try to show a helpful message from the server if available
-        const serverMsg = err.response?.data?.message || err.response?.data || err.message;
+        const serverMsg =
+          err.response?.data?.message || err.response?.data || err.message;
         setError(serverMsg || "Failed to load categories");
       } finally {
         setLoading(false);
@@ -27,142 +27,205 @@ function CategoriesList() {
     fetchCategories();
   }, []);
 
-  if (loading) {
-    return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading categories...</p>;
-  }
+  const handleDelete = async (e, id, name) => {
+    e.stopPropagation();
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${name}"?`
+    );
+    if (!confirmDelete) return;
 
-  if (error) {
-    return <p style={{ textAlign: "center", color: "red" }}>{error}</p>;
-  }
-
-const handleDelete = async (e, id, name) => {
-  e.stopPropagation();
-  const confirmDelete = window.confirm(`Are you sure you want to delete "${name}"?`);
-  if (!confirmDelete) return;
-
-  try {
-  await categoriesApi.delete(`/categories/${id}`);
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-    alert("✅ Category deleted successfully!");
-  } catch (error) {
-    console.error(error);
-    alert("❌ Failed to delete category. Please try again.");
-  }
-};
+    try {
+      await categoriesApi.delete(`/categories/${id}`);
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+      alert("✅ Category deleted successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("❌ Failed to delete category. Please try again.");
+    }
+  };
 
   const admin = isAdmin();
 
-  return (
-    <div
-      style={{
-        padding: "40px",
-        background: "linear-gradient(to right, #667eea, #764ba2)",
-        minHeight: "100vh",
-        color: "#fff",
-        fontFamily: "Segoe UI, sans-serif",
-      }}
-    >
-      <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: "30px",
-    }}
-  >
-    <h2 style={{ fontSize: "2rem" }}>📦 Categories</h2>
-    {admin && (
-  <button
-    onClick={() => navigate("/categories/add")}
-    style={{
-      backgroundColor: "#4CAF50",
-      border: "none",
-      color: "#fff",
-      padding: "10px 20px",
-      borderRadius: "8px",
-      cursor: "pointer",
-      fontWeight: "bold",
-      marginBottom: "20px",
-    }}
-  >
-    ➕ Add Category
-  </button>
-)}
-      </div>
+  // 🎨 التنسيقات الاحترافية الموحدة
+  const pageStyle = {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #667eea, #764ba2)",
+    color: "#fff",
+    fontFamily: "Segoe UI, sans-serif",
+    padding: "40px",
+  };
 
-      <div
+  const headerStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
+  };
+
+  const titleStyle = {
+    fontSize: "2rem",
+    fontWeight: "600",
+    letterSpacing: "1px",
+  };
+
+  const addButtonStyle = {
+    background: "linear-gradient(90deg, #4CAF50, #2e8b57)",
+    border: "none",
+    color: "#fff",
+    padding: "10px 22px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    transition: "0.3s",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+  };
+
+  const hoverAdd = (e, hover) => {
+    e.target.style.background = hover
+      ? "linear-gradient(90deg, #3e8e41, #1e6931)"
+      : "linear-gradient(90deg, #4CAF50, #2e8b57)";
+  };
+
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+    gap: "25px",
+  };
+
+  const cardStyle = {
+    background: "rgba(255, 255, 255, 0.15)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    borderRadius: "16px",
+    padding: "25px",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    cursor: "pointer",
+  };
+
+  const cardHover = (e, hover) => {
+    e.currentTarget.style.transform = hover ? "scale(1.05)" : "scale(1)";
+    e.currentTarget.style.boxShadow = hover
+      ? "0 10px 25px rgba(0,0,0,0.4)"
+      : "0 8px 20px rgba(0,0,0,0.3)";
+  };
+
+  const btnStyle = {
+    padding: "7px 14px",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    color: "#fff",
+    transition: "0.3s",
+  };
+
+  const editBtn = {
+    ...btnStyle,
+    backgroundColor: "#2196F3",
+    marginRight: "10px",
+  };
+
+  const delBtn = {
+    ...btnStyle,
+    backgroundColor: "#f44336",
+  };
+
+  if (loading)
+    return (
+      <p style={{ textAlign: "center", marginTop: "80px", fontSize: "18px" }}>
+        ⏳ Loading categories...
+      </p>
+    );
+
+  if (error)
+    return (
+      <p
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gap: "20px",
+          textAlign: "center",
+          color: "#ff4d4f",
+          fontWeight: "bold",
+          marginTop: "50px",
         }}
       >
-        {categories.length > 0 ? (
-          categories.map((cat) => (
-  <div
-    key={cat.id}
-    style={{
-      background: "rgba(255,255,255,0.1)",
-      borderRadius: "15px",
-      padding: "20px",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-      transition: "transform 0.2s ease",
-      cursor: "pointer",
-    }}
-    onClick={() => navigate(`/categories/${cat.id}`)}
-    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-  >
-    <h3 style={{ color: "#fff", marginBottom: "10px" }}>{cat.name}</h3>
-    <p style={{ color: "#ddd" }}>
-      {cat.description || "No description available"}
-    </p>
+        {error}
+      </p>
+    );
 
-    {/* 🧩 أزرار التحكم */}
-    {admin && (
-  <div style={{ marginTop: "10px" }}>
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        navigate(`/categories/edit/${cat.id}`);
-      }}
-      style={{
-        backgroundColor: "#2196F3",
-        border: "none",
-        color: "#fff",
-        padding: "6px 12px",
-        borderRadius: "6px",
-        cursor: "pointer",
-        fontWeight: "bold",
-        marginRight: "10px",
-      }}
-    >
-      ✏️ Edit
-    </button>
-
-    <button
-      onClick={(e) => handleDelete(e, cat.id, cat.name)}
-      style={{
-        backgroundColor: "#f44336",
-        border: "none",
-        color: "#fff",
-        padding: "6px 12px",
-        borderRadius: "6px",
-        cursor: "pointer",
-        fontWeight: "bold",
-      }}
-    >
-      🗑 Delete
-    </button>
-  </div>
-)}
-
-  </div>
-))
-        ) : (
-          <p style={{ textAlign: "center", fontWeight: "bolder" , color: "#000" , fontStyle: "italic" , marginLeft: "70px" }}>No categories found.</p>
+  return (
+    <div style={pageStyle}>
+      <div style={headerStyle}>
+        <h2 style={titleStyle}>📦 Categories</h2>
+        {admin && (
+          <button
+            style={addButtonStyle}
+            onClick={() => navigate("/categories/add")}
+            onMouseEnter={(e) => hoverAdd(e, true)}
+            onMouseLeave={(e) => hoverAdd(e, false)}
+          >
+            ➕ Add Category
+          </button>
         )}
       </div>
+
+      {categories.length > 0 ? (
+        <div style={gridStyle}>
+          {categories.map((cat) => (
+            <div
+              key={cat.id}
+              style={cardStyle}
+              onClick={() => navigate(`/categories/${cat.id}`)}
+              onMouseEnter={(e) => cardHover(e, true)}
+              onMouseLeave={(e) => cardHover(e, false)}
+            >
+              <h3
+                style={{
+                  marginBottom: "10px",
+                  fontSize: "18px",
+                  fontWeight: "600",
+                }}
+              >
+                {cat.name}
+              </h3>
+              <p style={{ color: "#e0e0e0", minHeight: "40px" }}>
+                {cat.description || "No description available"}
+              </p>
+
+              {admin && (
+                <div style={{ marginTop: "15px" }}>
+                  <button
+                    style={editBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/categories/edit/${cat.id}`);
+                    }}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    style={delBtn}
+                    onClick={(e) => handleDelete(e, cat.id, cat.name)}
+                  >
+                    🗑 Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p
+          style={{
+            textAlign: "center",
+            fontWeight: "600",
+            fontStyle: "italic",
+            color: "#eee",
+            marginTop: "40px",
+          }}
+        >
+          No categories found.
+        </p>
+      )}
     </div>
   );
 }

@@ -23,7 +23,7 @@ function ProductsList() {
         setProducts(productsRes.data);
         setCategories(categoriesRes.data);
       } catch (err) {
-        setError("Failed to load products or categories");
+        setError("⚠️ Failed to load products or categories");
       } finally {
         setLoading(false);
       }
@@ -39,7 +39,7 @@ function ProductsList() {
     e.stopPropagation();
     if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
     try {
-  await productsApi.delete(`/Products/${id}`);
+      await productsApi.delete(`/Products/${id}`);
       setProducts((prev) => prev.filter((p) => p.id !== id));
       alert("✅ Product deleted successfully!");
     } catch (error) {
@@ -47,71 +47,230 @@ function ProductsList() {
     }
   };
 
-  if (loading) return <p style={{ textAlign: "center", marginTop: 50 }}>Loading products...</p>;
-  if (error) return <p style={{ textAlign: "center", color: "red" }}>{error}</p>;
+  if (loading)
+    return (
+      <p style={{ textAlign: "center", marginTop: 50, fontSize: 18 }}>
+        Loading products...
+      </p>
+    );
+  if (error)
+    return (
+      <p style={{ textAlign: "center", color: "red", fontWeight: 600 }}>
+        {error}
+      </p>
+    );
 
   return (
-    <div style={{ padding: 40, background: "#f5f6fa", minHeight: "100vh", fontFamily: "Segoe UI, sans-serif" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, gap: 16, flexWrap: "wrap" }}>
-        <h2 style={{ fontSize: "2rem" }}>🛒 Products</h2>
+    <div
+      style={{
+        padding: "50px 40px",
+        background: "linear-gradient(135deg, #f6f7fb, #f0f2f8)",
+        minHeight: "100vh",
+        fontFamily: "Segoe UI, sans-serif"
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          marginBottom: 30,
+          gap: 16
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "2.2rem",
+            fontWeight: "bold",
+            color: "#333",
+            letterSpacing: 0.5
+          }}
+        >
+          🛒 Product Management
+        </h2>
+
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <label htmlFor="categoryFilter" style={{ color: "#333", fontWeight: 600 }}>Category:</label>
+          <label
+            htmlFor="categoryFilter"
+            style={{ color: "#444", fontWeight: 600 }}
+          >
+            Category:
+          </label>
           <select
             id="categoryFilter"
             value={selectedCategoryId}
             onChange={(e) => setSelectedCategoryId(e.target.value)}
-            style={{ padding: 8, borderRadius: 8, border: "1px solid #ccc", minWidth: 180, background: "#fff" }}
+            style={{
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid #ccc",
+              minWidth: 180,
+              background: "#fff",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+              cursor: "pointer"
+            }}
           >
             <option value="">All</option>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
             ))}
           </select>
         </div>
+
         {admin && (
           <button
             onClick={() => navigate("/products/add")}
-            style={{ backgroundColor: "#4CAF50", border: "none", color: "#fff", padding: "10px 20px", borderRadius: 8, cursor: "pointer", fontWeight: "bold" }}
+            style={{
+              backgroundColor: "#3b82f6",
+              border: "none",
+              color: "#fff",
+              padding: "10px 20px",
+              borderRadius: 10,
+              cursor: "pointer",
+              fontWeight: "bold",
+              boxShadow: "0 4px 10px rgba(59,130,246,0.3)",
+              transition: "all 0.3s ease"
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#2563eb")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#3b82f6")
+            }
           >
             ➕ Add Product
           </button>
         )}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))", gap: 20 }}>
+
+      {/* Product Grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+          gap: 25
+        }}
+      >
         {visibleProducts.length > 0 ? (
           visibleProducts.map((prod) => (
             <div
               key={prod.id}
-              style={{ background: "#fff", borderRadius: 15, padding: 20, boxShadow: "0 4px 10px rgba(0,0,0,0.1)", cursor: "pointer", transition: "transform 0.2s" }}
+              style={{
+                background: "#fff",
+                borderRadius: 16,
+                padding: 20,
+                boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                cursor: "pointer",
+                transition: "transform 0.25s, box-shadow 0.25s"
+              }}
               onClick={() => navigate(`/products/${prod.id}`)}
-              onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.03)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-5px)";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 20px rgba(0,0,0,0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 15px rgba(0,0,0,0.1)";
+              }}
             >
-              <h3 style={{ color: "#333", marginBottom: 10 }}>{prod.name}</h3>
-              <p style={{ color: "#666", fontSize: 15 }}>{prod.description || "No description"}</p>
-              <p style={{ color: "#007bff", fontWeight: "bold" }}>Price: ${prod.price}</p>
-              <p style={{ color: "#888" }}>Stock: {prod.stock}</p>
-              <p style={{ color: "#888" }}>
-                Category: {
-                  categories.find((cat) => cat.id === prod.categoryId)?.name || prod.categoryName || prod.categoryId
+              <h3
+                style={{
+                  color: "#111",
+                  fontSize: "1.3rem",
+                  marginBottom: 10,
+                  fontWeight: 600
+                }}
+              >
+                {prod.name}
+              </h3>
+              <p style={{ color: "#555", fontSize: 14, marginBottom: 6 }}>
+                {prod.description || "No description available."}
+              </p>
+              <p style={{ color: "#007bff", fontWeight: "bold" }}>
+                💲 Price: ${prod.price}
+              </p>
+              <p style={{ color: "#666", fontSize: 14 }}>
+                Stock: <b>{prod.stock}</b>
+              </p>
+              <p style={{ color: "#888", fontSize: 14 }}>
+                Category:{" "}
+                {
+                  categories.find((cat) => cat.id === prod.categoryId)?.name ||
+                  prod.categoryName ||
+                  prod.categoryId
                 }
               </p>
+
               {admin && (
-                <div style={{ marginTop: 10 }}>
+                <div style={{ marginTop: 15, display: "flex", gap: 10 }}>
                   <button
-                    onClick={e => { e.stopPropagation(); navigate(`/products/edit/${prod.id}`); }}
-                    style={{ backgroundColor: "#2196F3", border: "none", color: "#fff", padding: "6px 12px", borderRadius: 6, cursor: "pointer", fontWeight: "bold", marginRight: 10 }}
-                  >✏️ Edit</button>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/products/edit/${prod.id}`);
+                    }}
+                    style={{
+                      backgroundColor: "#10b981",
+                      border: "none",
+                      color: "#fff",
+                      padding: "8px 14px",
+                      borderRadius: 8,
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                      transition: "background 0.3s ease"
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#059669")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#10b981")
+                    }
+                  >
+                    ✏️ Edit
+                  </button>
+
                   <button
-                    onClick={e => handleDelete(e, prod.id, prod.name)}
-                    style={{ backgroundColor: "#f44336", border: "none", color: "#fff", padding: "6px 12px", borderRadius: 6, cursor: "pointer", fontWeight: "bold" }}
-                  >🗑 Delete</button>
+                    onClick={(e) => handleDelete(e, prod.id, prod.name)}
+                    style={{
+                      backgroundColor: "#ef4444",
+                      border: "none",
+                      color: "#fff",
+                      padding: "8px 14px",
+                      borderRadius: 8,
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                      transition: "background 0.3s ease"
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#dc2626")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#ef4444")
+                    }
+                  >
+                    🗑 Delete
+                  </button>
                 </div>
               )}
             </div>
           ))
         ) : (
-          <p style={{ textAlign: "center", fontWeight: "bolder", color: "#000", fontStyle: "italic" }}>No products found.</p>
+          <p
+            style={{
+              textAlign: "center",
+              fontWeight: "bolder",
+              color: "#333",
+              fontStyle: "italic",
+              gridColumn: "1 / -1"
+            }}
+          >
+            No products found.
+          </p>
         )}
       </div>
     </div>

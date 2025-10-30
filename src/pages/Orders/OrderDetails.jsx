@@ -11,6 +11,7 @@ function OrderDetails() {
     if (isNaN(dt.getTime())) return str;
     return dt.toLocaleString();
   };
+
   const { id } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
@@ -35,7 +36,7 @@ function OrderDetails() {
 
   if (loading)
     return (
-      <div style={{ padding: 20, fontSize: 18, textAlign: "center" }}>
+      <div style={{ padding: 40, fontSize: 18, textAlign: "center", color: "#fff", fontFamily: "'Segoe UI', sans-serif" }}>
         Loading...
       </div>
     );
@@ -45,11 +46,13 @@ function OrderDetails() {
       <div
         style={{
           padding: 20,
-          color: "white",
-          backgroundColor: "#dc3545",
-          borderRadius: 8,
+          color: "#fff",
+          backgroundColor: "#ef4444",
+          borderRadius: 12,
           margin: 20,
           textAlign: "center",
+          fontWeight: "bold",
+          fontFamily: "'Segoe UI', sans-serif",
         }}
       >
         {error}
@@ -61,55 +64,63 @@ function OrderDetails() {
   const items = order.items || order.Items || [];
   const user = order.user || order.User || null;
 
+  const cardStyle = {
+    background: "rgba(255,255,255,0.15)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    borderRadius: "20px",
+    padding: "30px",
+    width: "90%",
+    maxWidth: 850,
+    boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+    color: "#fff",
+  };
+
+  const backBtnStyle = {
+    background: "#fff",
+    color: "#333",
+    border: "none",
+    padding: "10px 18px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+    marginBottom: "20px",
+    transition: "0.3s",
+  };
+
+  const hoverBackBtn = (e, hover) => {
+    e.target.style.transform = hover ? "scale(1.05)" : "scale(1)";
+  };
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#f5f7fa",
+        background: "linear-gradient(135deg, #667eea, #764ba2)",
         display: "flex",
         justifyContent: "center",
         alignItems: "flex-start",
-        paddingTop: 40,
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        paddingTop: 50,
+        fontFamily: "'Segoe UI', sans-serif",
       }}
     >
-      <div
-        style={{
-          background: "white",
-          width: "90%",
-          maxWidth: 800,
-          borderRadius: 12,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          padding: "24px 32px",
-        }}
-      >
+      <div style={cardStyle}>
         <button
           onClick={() => navigate(-1)}
-          style={{
-            marginBottom: 20,
-            padding: "8px 16px",
-            background: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            cursor: "pointer",
-            fontSize: 14,
-          }}
+          style={backBtnStyle}
+          onMouseEnter={(e) => hoverBackBtn(e, true)}
+          onMouseLeave={(e) => hoverBackBtn(e, false)}
         >
           ← Back
         </button>
 
-        <h2 style={{ marginBottom: 10, color: "#333" }}>
-          Order #{order.id || order.Id}
-        </h2>
+        <h2 style={{ marginBottom: 10, fontWeight: "bold" }}>Order #{order.id || order.Id}</h2>
         <p style={{ margin: "6px 0" }}>
           <strong>Status:</strong>{" "}
           <span
             style={{
-              color:
-                (order.status || order.Status)?.toLowerCase() === "completed"
-                  ? "green"
-                  : "#555",
+              color: (order.status || order.Status)?.toLowerCase() === "completed" ? "#34d399" : "#facc15",
               fontWeight: "600",
             }}
           >
@@ -117,22 +128,21 @@ function OrderDetails() {
           </span>
         </p>
         <p style={{ margin: "6px 0" }}>
-          <strong>Date:</strong>{" "}
-          {formatOrderDate(order.orderDate || order.OrderDate)}
+          <strong>Date:</strong> {formatOrderDate(order.orderDate || order.OrderDate)}
         </p>
 
         {user && (
           <div
             style={{
-              background: "#f9fafc",
-              padding: 12,
-              borderRadius: 8,
-              marginTop: 16,
-              marginBottom: 24,
-              border: "1px solid #eee",
+              background: "rgba(255,255,255,0.1)",
+              padding: 16,
+              borderRadius: 12,
+              marginTop: 20,
+              marginBottom: 25,
+              border: "1px solid rgba(255,255,255,0.3)",
             }}
           >
-            <h4 style={{ marginBottom: 8, color: "#444" }}>User Info</h4>
+            <h4 style={{ marginBottom: 8, fontWeight: "600" }}>User Info</h4>
             <div style={{ marginBottom: 4 }}>
               <strong>Username:</strong> {user.userName || user.UserName}
             </div>
@@ -142,23 +152,16 @@ function OrderDetails() {
           </div>
         )}
 
-        <h3 style={{ marginBottom: 10, color: "#333" }}>Items</h3>
+        <h3 style={{ marginBottom: 15, fontWeight: "600" }}>Items</h3>
         {items.length === 0 ? (
-          <p style={{ color: "#777" }}>No items.</p>
+          <p style={{ color: "#f3f4f6", fontStyle: "italic" }}>No items.</p>
         ) : (
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              borderRadius: 8,
-              overflow: "hidden",
-            }}
-          >
-            <thead style={{ background: "#007bff", color: "white" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", borderRadius: 12, overflow: "hidden" }}>
+            <thead style={{ background: "rgba(255,255,255,0.25)", color: "#fff" }}>
               <tr>
-                <th style={{ textAlign: "left", padding: 10 }}>Product Name</th>
-                <th style={{ textAlign: "left", padding: 10 }}>Qty</th>
-                <th style={{ textAlign: "left", padding: 10 }}>Price</th>
+                <th style={{ textAlign: "left", padding: 12 }}>Product Name</th>
+                <th style={{ textAlign: "left", padding: 12 }}>Qty</th>
+                <th style={{ textAlign: "left", padding: 12 }}>Price</th>
               </tr>
             </thead>
             <tbody>
@@ -166,19 +169,13 @@ function OrderDetails() {
                 <tr
                   key={idx}
                   style={{
-                    background: idx % 2 === 0 ? "#f9f9f9" : "white",
-                    borderBottom: "1px solid #eee",
+                    background: idx % 2 === 0 ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
+                    borderBottom: "1px solid rgba(255,255,255,0.2)",
                   }}
                 >
-                  <td style={{ padding: 10 }}>
-                    {it.productName || it.ProductName || "-"}
-                  </td>
-                  <td style={{ padding: 10 }}>
-                    {it.quantity || it.Quantity}
-                  </td>
-                  <td style={{ padding: 10 }}>
-                    ${it.price || it.Price}
-                  </td>
+                  <td style={{ padding: 12 }}>{it.productName || it.ProductName || "-"}</td>
+                  <td style={{ padding: 12 }}>{it.quantity || it.Quantity}</td>
+                  <td style={{ padding: 12 }}>${it.price || it.Price}</td>
                 </tr>
               ))}
             </tbody>

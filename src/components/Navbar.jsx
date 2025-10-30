@@ -6,111 +6,172 @@ function Navbar({ isLoggedIn, setIsLoggedIn, userName }) {
 
   const handleLogout = () => {
     localStorage.clear();
-    setIsLoggedIn(false); // تحديث حالة تسجيل الدخول فورًا
+    setIsLoggedIn(false);
     navigate("/");
   };
 
+  // 🎨 التنسيقات اليدوية داخل الصفحة
+  const navStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "15px 40px",
+    background: "rgba(255, 255, 255, 0.1)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
+    color: "#fff",
+    fontFamily: "'Segoe UI', sans-serif",
+    position: "sticky",
+    top: 0,
+    zIndex: 1000,
+  };
+
+  const navLeft = {
+    display: "flex",
+    alignItems: "center",
+    gap: "25px",
+  };
+
+  const linkStyle = {
+    cursor: "pointer",
+    fontSize: "17px",
+    fontWeight: "500",
+    transition: "color 0.3s, transform 0.3s",
+  };
+
+  const linkHover = (e, hover) => {
+    e.target.style.color = hover ? "#d3c6ff" : "#fff";
+    e.target.style.transform = hover ? "translateY(-2px)" : "translateY(0)";
+  };
+
+  const buttonStyle = {
+    padding: "8px 16px",
+    borderRadius: "8px",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: "14px",
+    transition: "all 0.3s ease",
+  };
+
+  const btnGradient = {
+    ...buttonStyle,
+    background: "linear-gradient(90deg, #6a5af9, #8740ff)",
+    color: "#fff",
+    boxShadow: "0 4px 10px rgba(134, 67, 255, 0.4)",
+  };
+
+  const btnWhite = {
+    ...buttonStyle,
+    backgroundColor: "#fff",
+    color: "#6a5af9",
+  };
+
+  const btnDanger = {
+    ...buttonStyle,
+    backgroundColor: "#ff4d4f",
+    color: "#fff",
+  };
+
+  const buttonHover = (e, type, hover) => {
+    if (type === "gradient") {
+      e.target.style.background = hover
+        ? "linear-gradient(90deg, #5a50f5, #7339f5)"
+        : "linear-gradient(90deg, #6a5af9, #8740ff)";
+      e.target.style.transform = hover ? "translateY(-2px)" : "translateY(0)";
+      e.target.style.boxShadow = hover
+        ? "0 6px 14px rgba(134, 67, 255, 0.6)"
+        : "0 4px 10px rgba(134, 67, 255, 0.4)";
+    } else if (type === "white") {
+      e.target.style.backgroundColor = hover ? "#f0eaff" : "#fff";
+    } else if (type === "danger") {
+      e.target.style.backgroundColor = hover ? "#e63c3f" : "#ff4d4f";
+    }
+  };
+
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "10px 20px",
-        backgroundColor: "#007bff",
-        color: "#fff",
-      }}
-    >
+    <nav style={navStyle}>
       {/* ✅ الجزء الأيسر من النافبار */}
-      <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-        <h2 style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+      <div style={navLeft}>
+        <h2
+          style={linkStyle}
+          onClick={() => navigate("/")}
+          onMouseEnter={(e) => linkHover(e, true)}
+          onMouseLeave={(e) => linkHover(e, false)}
+        >
           Home
         </h2>
+
         {isLoggedIn && (
           <>
             <h2
-              style={{ cursor: "pointer" }}
+              style={linkStyle}
               onClick={() => navigate("/categories")}
+              onMouseEnter={(e) => linkHover(e, true)}
+              onMouseLeave={(e) => linkHover(e, false)}
             >
               Categories
             </h2>
             <h2
-              style={{ cursor: "pointer" }}
+              style={linkStyle}
               onClick={() => navigate("/products")}
+              onMouseEnter={(e) => linkHover(e, true)}
+              onMouseLeave={(e) => linkHover(e, false)}
             >
               Products
             </h2>
+            <h2
+              style={linkStyle}
+              onClick={() => navigate("/orders")}
+              onMouseEnter={(e) => linkHover(e, true)}
+              onMouseLeave={(e) => linkHover(e, false)}
+            >
+              Orders
+            </h2>
           </>
-        )}
-        {isLoggedIn && (
-          <h2
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/orders")}
-          >
-            Orders
-          </h2>
         )}
       </div>
 
       {/* ✅ الجزء الأيمن من النافبار */}
-      <div>
+      <div style={{ display: "flex", alignItems: "center" }}>
         {!isLoggedIn ? (
           <>
             <button
               onClick={() => navigate("/login")}
-              style={{
-                marginRight: "10px",
-                padding: "6px 12px",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
+              style={btnGradient}
+              onMouseEnter={(e) => buttonHover(e, "gradient", true)}
+              onMouseLeave={(e) => buttonHover(e, "gradient", false)}
             >
               Login
             </button>
-
             <button
               onClick={() => navigate("/register")}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-                backgroundColor: "#fff",
-                color: "#007bff",
-              }}
+              style={{ ...btnWhite, marginLeft: "10px" }}
+              onMouseEnter={(e) => buttonHover(e, "white", true)}
+              onMouseLeave={(e) => buttonHover(e, "white", false)}
             >
               Register
             </button>
           </>
         ) : (
           <>
-            <span style={{ marginRight: "15px" }}>Hello, {userName}</span>
+            <span style={{ marginRight: "15px", fontSize: "15px" }}>
+              Hello, <strong>{userName}</strong>
+            </span>
             <button
               onClick={() => navigate("/profile")}
-              style={{
-                marginRight: "10px",
-                padding: "6px 12px",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-                backgroundColor: "#fff",
-                color: "#007bff",
-              }}
+              style={btnWhite}
+              onMouseEnter={(e) => buttonHover(e, "white", true)}
+              onMouseLeave={(e) => buttonHover(e, "white", false)}
             >
               Profile
             </button>
-
             <button
               onClick={handleLogout}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-                backgroundColor: "#ff4d4f",
-                color: "#fff",
-              }}
+              style={{ ...btnDanger, marginLeft: "10px" }}
+              onMouseEnter={(e) => buttonHover(e, "danger", true)}
+              onMouseLeave={(e) => buttonHover(e, "danger", false)}
             >
               Logout
             </button>

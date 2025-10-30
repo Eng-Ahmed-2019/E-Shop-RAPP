@@ -38,9 +38,7 @@ function CreateOrder() {
       if (!cancelled) setNamesByIndex(map);
     };
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [items]);
 
   const updateItem = (idx, field, value) => {
@@ -92,45 +90,97 @@ function CreateOrder() {
     }
   };
 
+  // 🎨 تنسيقات الصفحة الاحترافية
+  const pageStyle = {
+    maxWidth: "900px",
+    margin: "60px auto",
+    padding: "40px",
+    borderRadius: "20px",
+    background: "rgba(255,255,255,0.15)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+    fontFamily: "'Segoe UI', sans-serif",
+    color: "#fff",
+  };
+
+  const backBtnStyle = {
+    background: "#fff",
+    color: "#333",
+    border: "none",
+    padding: "10px 18px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+    marginRight: "16px",
+    transition: "0.3s",
+  };
+
+  const hoverBackBtn = (e, hover) => {
+    e.target.style.transform = hover ? "scale(1.05)" : "scale(1)";
+  };
+
+  const cardStyle = {
+    background: "rgba(255,255,255,0.15)",
+    borderRadius: "20px",
+    padding: "25px",
+    marginBottom: "20px",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+    transition: "transform 0.2s ease",
+  };
+
+  const inputStyle = {
+    padding: "10px",
+    borderRadius: "10px",
+    border: "none",
+    outline: "none",
+    fontSize: "14px",
+    width: "100%",
+    background: "rgba(255,255,255,0.2)",
+    color: "#fff",
+  };
+
+  const buttonStyle = {
+    padding: "12px 20px",
+    borderRadius: "10px",
+    border: "none",
+    fontWeight: "bold",
+    cursor: "pointer",
+    background: "linear-gradient(90deg, #2196F3, #0b79d0)",
+    color: "#fff",
+    transition: "0.3s",
+  };
+
+  const hoverButton = (e, hover) => {
+    e.target.style.background = hover
+      ? "linear-gradient(90deg, #0b79d0, #0a6cb8)"
+      : "linear-gradient(90deg, #2196F3, #0b79d0)";
+  };
+
   return (
-    <div
-      style={{
-        maxWidth: "900px",
-        margin: "60px auto",
-        background: "linear-gradient(135deg, #f9fafb, #eef1f4)",
-        borderRadius: "14px",
-        boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
-        padding: "40px",
-        fontFamily: "'Segoe UI', sans-serif",
-      }}
-    >
+    <div style={pageStyle}>
       <div style={{ display: "flex", alignItems: "center", marginBottom: "25px" }}>
         <button
           onClick={() => navigate(-1)}
-          style={{
-            background: "#2563eb",
-            color: "#fff",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: "500",
-            marginRight: "16px",
-          }}
+          style={backBtnStyle}
+          onMouseEnter={(e) => hoverBackBtn(e, true)}
+          onMouseLeave={(e) => hoverBackBtn(e, false)}
         >
           ⬅ Back
         </button>
-        <h2 style={{ color: "#1f2937", margin: 0 }}>🛒 Create New Order</h2>
+        <h2 style={{ margin: 0, fontWeight: "bold" }}>🛒 Create New Order</h2>
       </div>
 
       {error && (
         <div
           style={{
-            backgroundColor: "#fee2e2",
-            color: "#b91c1c",
+            background: "rgba(255, 0, 0, 0.2)",
             padding: "10px 15px",
-            borderRadius: "8px",
-            marginBottom: "15px",
+            borderRadius: "10px",
+            marginBottom: "20px",
+            color: "#b91c1c",
+            fontWeight: "bold",
           }}
         >
           {error}
@@ -139,110 +189,47 @@ function CreateOrder() {
 
       <form onSubmit={onSubmit}>
         {items.map((it, idx) => (
-          <div
-            key={idx}
-            style={{
-              background: "#ffffff",
-              padding: "20px",
-              borderRadius: "10px",
-              marginBottom: "15px",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-              transition: "transform 0.2s ease",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                gap: "20px",
-                flexWrap: "wrap",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              {/* Product Name (instead of ID) */}
-              <div style={{ display: "flex", flexDirection: "column", flex: "1.2" }}>
-                <label style={{ fontSize: "14px", color: "#374151", marginBottom: "6px" }}>
-                  Product
-                </label>
+          <div key={idx} style={cardStyle}>
+            <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", alignItems: "center" }}>
+              <div style={{ flex: "1.2", display: "flex", flexDirection: "column" }}>
+                <label>Product</label>
                 <input
                   value={namesByIndex[idx] || `#${it.productId}`}
                   readOnly
                   title={`ID: ${it.productId}`}
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    backgroundColor: "#f3f4f6",
-                    cursor: "not-allowed",
-                    color: "#374151",
-                    fontSize: "14px",
-                  }}
+                  style={inputStyle}
                 />
               </div>
 
-              {/* Quantity */}
-              <div style={{ display: "flex", flexDirection: "column", flex: "1" }}>
-                <label style={{ fontSize: "14px", color: "#374151", marginBottom: "6px" }}>
-                  Quantity
-                </label>
+              <div style={{ flex: "1", display: "flex", flexDirection: "column" }}>
+                <label>Quantity</label>
                 <input
                   type="number"
                   min="0"
                   value={it.quantity}
                   onChange={(e) => updateItem(idx, "quantity", e.target.value)}
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    fontSize: "14px",
-                    outline: "none",
-                  }}
+                  style={inputStyle}
                 />
               </div>
 
-              {/* Total Price */}
-              <div style={{ display: "flex", flexDirection: "column", flex: "1" }}>
-                <label style={{ fontSize: "14px", color: "#374151", marginBottom: "6px" }}>
-                  Total Price
-                </label>
+              <div style={{ flex: "1", display: "flex", flexDirection: "column" }}>
+                <label>Total Price</label>
                 <input
                   value={it.price}
                   readOnly
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    backgroundColor: "#f3f4f6",
-                    color: "#374151",
-                    cursor: "not-allowed",
-                    fontSize: "14px",
-                  }}
+                  style={inputStyle}
                 />
               </div>
 
-              {/* Reset Button */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <label style={{ color: "transparent", marginBottom: "6px" }}>-</label>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                <label style={{ color: "transparent" }}>-</label>
                 <button
                   type="button"
                   onClick={() => resetItem(idx)}
                   title="Reset this item"
-                  style={{
-                    background: "#ef4444",
-                    color: "#fff",
-                    border: "none",
-                    padding: "10px 14px",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: "600",
-                    fontSize: "16px",
-                  }}
+                  style={{ ...buttonStyle, background: "#ef4444" }}
+                  onMouseEnter={(e) => hoverButton(e, true)}
+                  onMouseLeave={(e) => hoverButton(e, false)}
                 >
                   ✕
                 </button>
@@ -251,26 +238,15 @@ function CreateOrder() {
           </div>
         ))}
 
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "25px" }}>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              background: submitting ? "#9ca3af" : "#2563eb",
-              color: "#fff",
-              border: "none",
-              padding: "10px 22px",
-              borderRadius: "8px",
-              cursor: submitting ? "not-allowed" : "pointer",
-              fontWeight: "600",
-              fontSize: "15px",
-              transition: "background 0.3s ease",
-            }}
-          >
-            {submitting ? "Creating..." : "✅ Create Order"}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={submitting}
+          style={{ ...buttonStyle, width: "100%", marginTop: "20px" }}
+          onMouseEnter={(e) => hoverButton(e, true)}
+          onMouseLeave={(e) => hoverButton(e, false)}
+        >
+          {submitting ? "Creating..." : "✅ Create Order"}
+        </button>
       </form>
     </div>
   );

@@ -15,7 +15,7 @@ function EditCategory() {
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-  const response = await categoriesApi.get(`/categories/${id}`);
+        const response = await categoriesApi.get(`/categories/${id}`);
         setName(response.data.name);
         setDescription(response.data.description || "");
       } catch (err) {
@@ -35,7 +35,7 @@ function EditCategory() {
     setMessage("");
 
     try {
-  const response = await categoriesApi.put(`/categories/${id}`, {
+      const response = await categoriesApi.put(`/categories/${id}`, {
         id,
         name,
         description,
@@ -54,101 +54,138 @@ function EditCategory() {
   };
 
   if (loading) {
-    return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading...</p>;
+    return (
+      <p style={{ textAlign: "center", marginTop: "50px", fontSize: "18px" }}>
+        ⏳ Loading category...
+      </p>
+    );
   }
 
+  // 🎨 التنسيقات الاحترافية داخل الصفحة
+  const pageStyle = {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #667eea, #764ba2)",
+    padding: "40px",
+    fontFamily: "Segoe UI, sans-serif",
+    color: "#fff",
+  };
+
+  const backBtnStyle = {
+    marginBottom: "25px",
+    padding: "10px 18px",
+    border: "none",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    backgroundColor: "#fff",
+    color: "#333",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+    transition: "0.3s",
+  };
+
+  const hoverBackBtn = (e, hover) => {
+    e.target.style.transform = hover ? "scale(1.05)" : "scale(1)";
+  };
+
+  const formCardStyle = {
+    maxWidth: "500px",
+    margin: "0 auto",
+    padding: "30px",
+    borderRadius: "20px",
+    background: "rgba(255,255,255,0.15)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "12px",
+    borderRadius: "10px",
+    border: "none",
+    outline: "none",
+    background: "rgba(255,255,255,0.2)",
+    color: "#fff",
+    fontSize: "15px",
+    marginTop: "5px",
+  };
+
+  const textareaStyle = {
+    ...inputStyle,
+    minHeight: "100px",
+    resize: "vertical",
+  };
+
+  const buttonStyle = {
+    width: "100%",
+    padding: "14px",
+    borderRadius: "10px",
+    border: "none",
+    fontWeight: "bold",
+    fontSize: "16px",
+    cursor: "pointer",
+    color: "#fff",
+    background: "linear-gradient(90deg, #2196F3, #0b79d0)",
+    marginTop: "15px",
+    transition: "0.3s",
+  };
+
+  const hoverButton = (e, hover) => {
+    e.target.style.background = hover
+      ? "linear-gradient(90deg, #0b79d0, #0a6cb8)"
+      : "linear-gradient(90deg, #2196F3, #0b79d0)";
+  };
+
   return (
-    <div
-      style={{
-        padding: "40px",
-        background: "linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d)",
-        minHeight: "100vh",
-        color: "#fff",
-        fontFamily: "Segoe UI, sans-serif",
-      }}
-    >
+    <div style={pageStyle}>
       <button
         onClick={() => navigate(-1)}
-        style={{
-          marginBottom: "20px",
-          padding: "8px 16px",
-          border: "none",
-          backgroundColor: "#fff",
-          color: "#333",
-          borderRadius: "8px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
+        style={backBtnStyle}
+        onMouseEnter={(e) => hoverBackBtn(e, true)}
+        onMouseLeave={(e) => hoverBackBtn(e, false)}
       >
         ← Back
       </button>
 
-      <h2 style={{ textAlign: "center", marginBottom: "30px" }}>✏️ Edit Category</h2>
+      <h2 style={{ textAlign: "center", marginBottom: "30px", fontWeight: "bold" }}>
+        ✏️ Edit Category
+      </h2>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          maxWidth: "500px",
-          margin: "0 auto",
-          background: "rgba(255,255,255,0.1)",
-          padding: "30px",
-          borderRadius: "15px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-        }}
-      >
-        <div style={{ marginBottom: "15px" }}>
+      <form style={formCardStyle} onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "20px" }}>
           <label>Name:</label>
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "8px",
-              border: "none",
-              marginTop: "5px",
-            }}
+            style={inputStyle}
           />
         </div>
 
-        <div style={{ marginBottom: "15px" }}>
+        <div style={{ marginBottom: "20px" }}>
           <label>Description:</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            rows="4"
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "8px",
-              border: "none",
-              marginTop: "5px",
-            }}
+            style={textareaStyle}
           ></textarea>
         </div>
 
         <button
           type="submit"
           disabled={saving}
-          style={{
-            width: "100%",
-            padding: "12px",
-            border: "none",
-            borderRadius: "8px",
-            backgroundColor: "#2196F3",
-            color: "#fff",
-            fontSize: "16px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
+          style={buttonStyle}
+          onMouseEnter={(e) => hoverButton(e, true)}
+          onMouseLeave={(e) => hoverButton(e, false)}
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
 
         {message && (
-          <p style={{ marginTop: "20px", textAlign: "center" }}>{message}</p>
+          <p style={{ textAlign: "center", marginTop: "20px", fontWeight: "bold" }}>
+            {message}
+          </p>
         )}
       </form>
     </div>

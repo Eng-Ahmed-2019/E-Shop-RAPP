@@ -12,84 +12,149 @@ function Home({ isLoggedIn, userName }) {
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
-        background: "linear-gradient(to right, #4facfe, #00f2fe)",
+        background:
+          "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
         color: "#fff",
         textAlign: "center",
+        fontFamily: "Segoe UI, sans-serif",
+        padding: "0 20px",
       }}
     >
-      <h1 style={{ fontSize: "3rem", marginBottom: "1rem" }}>Welcome to E-Shop</h1>
+      <h1
+        style={{
+          fontSize: "3.2rem",
+          fontWeight: "bold",
+          marginBottom: "1rem",
+          textShadow: "0 4px 10px rgba(0,0,0,0.3)",
+          letterSpacing: 0.5,
+        }}
+      >
+        🛍️ Welcome to E-Shop
+      </h1>
 
       {isLoggedIn ? (
-        <p style={{ fontSize: "1.2rem", marginBottom: "2rem" }}>Hello, {userName}!</p>
+        <p
+          style={{
+            fontSize: "1.3rem",
+            marginBottom: "2rem",
+            opacity: 0.9,
+            fontWeight: 500,
+          }}
+        >
+          Hello, <span style={{ fontWeight: "bold" }}>{userName}</span> 👋  
+          <br />
+          Ready to explore our latest products?
+        </p>
       ) : (
-        <p style={{ fontSize: "1.2rem", marginBottom: "2rem" }}>
-          The best place to shop your favorite products.
+        <p
+          style={{
+            fontSize: "1.3rem",
+            marginBottom: "2rem",
+            maxWidth: 600,
+            opacity: 0.9,
+            lineHeight: 1.6,
+          }}
+        >
+          Discover the best deals and newest trends all in one place — your
+          favorite online shopping destination!
         </p>
       )}
 
-      <div>
+      <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
         {!isLoggedIn ? (
           <>
             <button
               onClick={() => navigate("/login")}
               style={{
                 backgroundColor: "#fff",
-                color: "#007bff",
+                color: "#2563eb",
                 border: "none",
-                padding: "10px 20px",
-                marginRight: "10px",
-                borderRadius: "8px",
+                padding: "12px 26px",
+                borderRadius: "10px",
                 fontSize: "1rem",
+                fontWeight: "bold",
                 cursor: "pointer",
-                transition: "all 0.3s",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 10px rgba(255,255,255,0.2)",
               }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#e6e6e6")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#fff")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#f3f4f6";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#fff";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
             >
-              Login
+              🔑 Login
             </button>
 
             <button
               onClick={() => navigate("/register")}
               style={{
-                backgroundColor: "#007bff",
+                backgroundColor: "#2563eb",
                 color: "#fff",
                 border: "none",
-                padding: "10px 20px",
-                borderRadius: "8px",
+                padding: "12px 26px",
+                borderRadius: "10px",
                 fontSize: "1rem",
+                fontWeight: "bold",
                 cursor: "pointer",
-                transition: "all 0.3s",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
               }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#1e40af";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#2563eb";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
             >
-              Register
+              📝 Register
             </button>
           </>
         ) : (
-          <>
-            <button
-              onClick={() => navigate("/profile")}
-              style={{
-                backgroundColor: "#fff",
-                color: "#007bff",
-                border: "none",
-                padding: "10px 20px",
-                marginRight: "10px",
-                borderRadius: "8px",
-                fontSize: "1rem",
-                cursor: "pointer",
-                transition: "all 0.3s",
-              }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#e6e6e6")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#fff")}
-            >
-              Profile
-            </button>
-          </>
+          <button
+            onClick={() => navigate("/profile")}
+            style={{
+              backgroundColor: "#fff",
+              color: "#2563eb",
+              border: "none",
+              padding: "12px 26px",
+              borderRadius: "10px",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: "0 4px 10px rgba(255,255,255,0.2)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#f3f4f6";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#fff";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            👤 Go to Profile
+          </button>
         )}
       </div>
+
+      <footer
+        style={{
+          position: "absolute",
+          bottom: "30px",
+          fontSize: "0.9rem",
+          opacity: 0.8,
+          letterSpacing: 0.3,
+        }}
+      >
+        © {new Date().getFullYear()} E-Shop. All rights reserved.
+      </footer>
     </div>
   );
 }
