@@ -1,13 +1,36 @@
 import React, { useEffect, useState } from "react";
 import productsApi from "../../services/productsApi";
 import { useParams, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showOrderButton, setShowOrderButton] = useState(false);
   const navigate = useNavigate();
+
+  // التحقق من دور المستخدم - إظهار الزر فقط للمستخدمين (User) وليس للـ Admin
+  useEffect(() => {
+    const checkUserRole = () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+          const decoded = jwtDecode(token);
+          const roleClaim = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+          const userRole = decoded[roleClaim];
+          // إظهار الزر فقط إذا كان الدور "User" وليس "Admin"
+          setShowOrderButton(userRole === "User");
+        } else {
+          setShowOrderButton(false);
+        }
+      } catch (err) {
+        setShowOrderButton(false);
+      }
+    };
+    checkUserRole();
+  }, []);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -114,25 +137,27 @@ function ProductDetails() {
           </div>
         )}
 
-        <button
-          onClick={() =>
-            navigate(`/orders/create?productId=${product.id || product.productId || id}&price=${product.price}`)
-          }
-          style={{
-            padding: "12px 20px",
-            backgroundColor: "#10b981",
-            color: "#fff",
-            border: "none",
-            borderRadius: 12,
-            fontWeight: "bold",
-            cursor: "pointer",
-            transition: "0.2s",
-            width: "100%",
-            fontSize: 16,
-          }}
-        >
-          Order this product
-        </button>
+        {showOrderButton && (
+          <button
+            onClick={() =>
+              navigate(`/orders/create?productId=${product.id || product.productId || id}&price=${product.price}`)
+            }
+            style={{
+              padding: "12px 20px",
+              backgroundColor: "#10b981",
+              color: "#fff",
+              border: "none",
+              borderRadius: 12,
+              fontWeight: "bold",
+              cursor: "pointer",
+              transition: "0.2s",
+              width: "100%",
+              fontSize: 16,
+            }}
+          >
+            Order this product
+          </button>
+        )}
       </div>
     </div>
   );
